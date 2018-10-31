@@ -6,7 +6,7 @@ console.log(process.env.PORT)
 
 const envVarSchema = Joi.object().keys({
   NODE_ENV: Joi.string().default('development').allow(['development', 'production']),
-  PORT: Joi.number().default(8080).allow([8080, 4000]),
+  PORT: Joi.number().default(80).allow([8080, 4000, 80]),
   VERSION: Joi.string(),
   MYSQL_PORT: Joi.number().default(3306), //數字且預設值為3306
   MYSQL_HOST: Joi.string().default('127.0.0.1'), //字串取預設值為127.0.0.1

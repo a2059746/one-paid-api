@@ -1,0 +1,55 @@
+{
+    "value": {
+        "MerID": "C018091320000001",
+        "MerTradeNo": "JPK-AA000000",
+        "MerTradeDate": "2018-10-23 13:30:00",
+        "PaymentType": 37,
+        "ProductName": "JPK款項",
+        "CurrencyType": 1,
+        "TotalAmt": "100",
+        "ReturnUrl": "http://149.28.146.174/api/op/cp/",
+        "Remark": "無",
+        "ShowResult": 0
+    },
+    "secCode": "9184c6821c5b4713937d26a305fd1353"
+} 
+
+{
+    "result": {
+        "StatusCode": "10001",
+        "Message": "成功",
+        "MerID": "C018091320000001",
+        "MerTradeNo": "TEST-JPK-AA000000",
+        "TradeNo": "TCV01810231453454655",
+        "PaymentDate": "0001-01-01 00:00:00",
+        "PaywayType": "1",
+        "PaymentType": "37",
+        "ProductName": "JPK款項",
+        "CurrencyType": "1",
+        "TotalAmt": "100.00",
+        "CustomeArgs": "{ "
+        StoreName ": "
+        超商代碼 ", "
+        CVSCode ": "
+        LDB81023919836 ", "
+        PayDeadline ": "
+        2018 - 10 - 25 23: 59 " }",
+        "Remark": "無",
+        "SignCode": "4ad26d3d8e5117dcc60edef3d9ebeb99"
+    }
+}
+RO_Id
+{
+    "StatusCode": "10001",
+    "Message": "成功 ",
+    "MerID": "C018091320000001",
+    "MerTradeNo": "T00000029",
+    "TradeNo": "TCV01809252323502268",
+    "PaymentDate": "2018-09-27 23:59:00",
+    "PaywayType": "1",
+    "PaymentType": 37,
+    "ProductName": "b001 ",
+    "CurrencyType": 1,
+    "TotalAmt": "180.00",
+    "SignCode": "e0f25ab17bff08d2c36d69839e19cc12"
+}

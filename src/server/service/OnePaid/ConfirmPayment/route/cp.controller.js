@@ -9,8 +9,13 @@ export const updateOrderStatus = async (req, res) => {
     })
   } catch(err) {
     res.json({
-      result: {},
+      result: null,
       err: err
     })
   }
 }
+/**
+ * 
+ * 
+ * 
+ */

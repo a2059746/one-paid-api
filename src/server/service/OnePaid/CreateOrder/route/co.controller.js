@@ -4,13 +4,19 @@ export const postOnePaidOrder = async (req, res) => {
   const order = req.body;
   const o_id = req.params.oid;
   try {
-    const result = await coModule.createOnePaidOrder(order, o_id);
-    res.json({
-      result: result
-    })
+    await coModule.createOnePaidOrder(order, o_id).then(scc => {
+      res.json({
+        result: scc
+      })
+    }, err => {
+      res.json({
+        result: null,
+        err: err,
+      })
+    });
   } catch(err) {
     res.json({
-      result: {},
+      result: null,
       err: err
     })
   }

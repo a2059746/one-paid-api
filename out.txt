@@ -1,0 +1,20 @@
+{
+    
+StatusCode: '10001',
+  Message: '成功',
+  MerID: 'C018091320000001',
+  MerTradeNo: 'TRADE09',
+  TradeNo: 'TBC01809231142249406',
+  PaymentDate: '0001-01-01 00:00:00',
+  PaywayType: '5',
+  PaymentType: '25',
+  ProductName: '好神拖',
+  CurrencyType: '1',
+  TotalAmt: '30.00',
+  CustomeArgs: '{\r\n  "Barcode1": "0709256EA",\r\n  "Barcode2": "37040180925451                                                     45",\r\n  "Barcode3": "092511000000030",\r\n  "PayDeadline": "2018-09-25 23:59"\                                                     r\n}',
+  Remark: '家庭必備良具',
+  SignCode: '059fd4712d9be0c52148307c026c5516'
+  
+  }
+
+

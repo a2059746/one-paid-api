@@ -2,9 +2,29 @@ import request from 'request';
 import * as crawler from '../crawler';
 import {createSignCode} from '../createSignCode'
 import * as orderModule from '../../../../routes/pgslq/onepaid/order/order.module';
-
+/**
+ * ORDER TYPE
+ * @param {Object} order 
+ * @param {string} order.value.MerID - 商家編號 C018091320000001
+ * @param {*} order.value.MerTradeNo -
+ * @param {*} order.value.MerTradeDate -
+ * @param {*} order.value.PaymentType - 37
+ * @param {*} order.value.ProductName - 
+ * @param {*} order.value.CurrencyType - 1
+ * @param {*} order.value.TotalAmt -
+ * @param {*} order.value.ReturnUrl - http://149.28.146.174/api/op/cp/
+ * @param {*} order.val ue.Remark -
+ * @param {*} order.value.CustomeArgs -
+ * @param {*} order.value.ShowResult - 0
+ * @param {*} order.value.SignCode -
+ * @param {*} order.secCode - 商店金鑰 9184c6821c5b4713937d26a305fd1353
+ * 
+ */
 export const createOnePaidOrder = (order, o_id) => {
+
   return new Promise( async (resolve, reject) => {
+    if(!order['value']) { reject(''); }
+    order['secCode'] = '9184c6821c5b4713937d26a305fd1353';
     let res;
     try {
       res = await step1(order);
@@ -17,6 +37,7 @@ export const createOnePaidOrder = (order, o_id) => {
 
     try {
       res = await step2(res);
+      resolve(res);
     } catch(err) {
       console.log('step2 error');
       console.log(err);
@@ -24,16 +45,16 @@ export const createOnePaidOrder = (order, o_id) => {
       return;
     }
 
-    try {
-      res = await step3(res, o_id);
-      console.log(res)
-      resolve(res);
-    } catch(err) {
-      console.log('step3 error');
-      console.log(err);
-      reject(err);
-      return;
-    }
+    // try {
+    //   res = await step3(res, o_id);
+    //   console.log(res)
+    //   resolve(res);
+    // } catch(err) {
+    //   console.log('step3 error');
+    //   console.log(err);
+    //   reject(err);
+    //   return;
+    // }
 
   })
 }
