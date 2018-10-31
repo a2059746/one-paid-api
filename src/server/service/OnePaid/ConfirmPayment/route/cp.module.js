@@ -40,6 +40,9 @@ export const updateOrderStatus = (queryObj) => {
         fireDB.ref(__PATH_REMIT_ORDERS).orderByChild('RO_Id').equalTo(queryObj['MerTradeNo'])
         .once('value').then(obj => {
           let scc = false;
+          console.log(obj)
+          if(!obj) { console.log('>>> 找不到訂單!!'); return 0; }
+          
           Object.keys(obj).forEach(key => {
             scc = true;
             fireDB.ref(__PATH_REMIT_ORDERS + key).update({
@@ -54,6 +57,7 @@ export const updateOrderStatus = (queryObj) => {
               console.log('>>> 成功發送通知');
             }, err => {
               console.log('>>> 失敗發送通知');
+              console.log(err)
               fireDB.ref(__PATH_PAY_LOGS_ERROR).push(Object.assign({_ERROR: '失敗發送通知'}, queryObj));
             })
           } else {
