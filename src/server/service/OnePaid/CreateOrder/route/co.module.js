@@ -36,8 +36,12 @@ export const createOnePaidOrder = (order, o_id) => {
     }
 
     try {
-      res = await step2(res);
-      resolve(res);
+      await step2(res).then(result => {
+        resolve(result);
+      }, err => {
+        reject(err);
+      });
+      
     } catch(err) {
       console.log('step2 error');
       console.log(err);
