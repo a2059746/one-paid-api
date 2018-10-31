@@ -38,8 +38,9 @@ export const updateOrderStatus = (queryObj) => {
       fireDB.ref(__PATH_PAY_LOGS).push(queryObj);
       if (queryObj['StatusCode'] === '10001') {
         fireDB.ref(__PATH_REMIT_ORDERS).orderByChild('RO_Id').equalTo(queryObj['MerTradeNo'])
-        .once('value').then(obj => {
+        .once('value').then(snap => {
           let scc = false;
+          let obj = snap.val();
           console.log(obj)
           if(!obj) { console.log('>>> 找不到訂單!!'); return 0; }
           
