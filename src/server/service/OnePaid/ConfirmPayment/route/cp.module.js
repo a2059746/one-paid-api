@@ -3,8 +3,12 @@ var OneSignal = require('onesignal-node');
 const OneS = new OneSignal.Client({
 	userAuthKey: 'YmY0ZjlmZDYtOWNjMC00MTAyLTg3MGQtMDQ5MzFmODhjYTNl',
 	// note that "app" must have "appAuthKey" and "appId" keys
-	app: { appAuthKey: 'NWUxZThhNWMtNTg5My00NzljLTg5MDItMjQ5ZDkyNmNmZTU3', appId: '073a36e3-7be4-41cf-a031-28e14d2fe0f0' }
+  app: {
+    appAuthKey: 'ODVkYjUxMGYtMDJlMS00Y2EzLTgzYmEtMGMxMTk2YjE4OWMx',
+    appId: '073a36e3-7be4-41cf-a031-28e14d2fe0f0'
+  }
 });
+
 const firebase = require("firebase-admin");
 var serviceAccount = require("../../../../../iintw-single-firebase-adminsdk-zzrlm-3b7ecc2991.json");
 firebase.initializeApp({
