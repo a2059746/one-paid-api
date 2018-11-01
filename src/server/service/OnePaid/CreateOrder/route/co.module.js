@@ -69,7 +69,9 @@ const step1 = (order) => {
   const signCode = createSignCode(order.value, order.secCode)
   let op_order = order.value;
   op_order['SignCode'] = signCode;
-  return postRequest(url, op_order, crawler.getOnePaidOrderKey);
+  console.log(order.value);
+  return Promise.resolve({});
+  // return postRequest(url, op_order, crawler.getOnePaidOrderKey);
 }
 
 // form: from One-Paid 'https://payment.onepaid.com/payment/payorder'
