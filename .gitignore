@@ -1,3 +1,8 @@
+/src/config/config.js
+.vscode/*
+/src/iintw-single-firebase-adminsdk-zzrlm-3b7ecc2991.json
+/html
+html.zip
 /node_modules/*
 /dist/*
 package-lock.json

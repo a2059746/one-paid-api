@@ -1,4 +1,5 @@
 import request from 'request';
+import { createSignCode } from '../../CreateOrder/createSignCode';
 var OneSignal = require('onesignal-node');
 const OneS = new OneSignal.Client({
 	userAuthKey: 'YmY0ZjlmZDYtOWNjMC00MTAyLTg3MGQtMDQ5MzFmODhjYTNl',
@@ -39,21 +40,32 @@ export const updateOrderStatus = (queryObj) => {
     console.log(queryObj);
     console.log('================ ORDER END =================');
     if (queryObj['StatusCode']) {
+      queryObj['_cbt'] = new Date().getTime();
       fireDB.ref(__PATH_PAY_LOGS).push(queryObj);
-      if (queryObj['StatusCode'] === '10001') {
-        fireDB.ref(__PATH_REMIT_ORDERS).orderByChild('RO_Id').equalTo(queryObj['MerTradeNo'])
+      if (queryObj['MerTradeNo']) {
+        let update = {
+          'RO_t': (queryObj['StatusCode'] === 10001)? '00002' : '09000',
+          'RO_c': (queryObj['StatusCode'] === 10001)? '已繳款並等待處理' : '訂單異常',
+          'ROP_PaymentDate': queryObj['PaymentDate'],
+          'ROP_PTime': new Date(queryObj['PaymentDate'] + ' GMT+0800').getTime(),
+          _OnePaid: JSON.stringify(queryObj),
+        };
+        fireDB.ref(__PATH_REMIT_ORDERS)
+        .orderByChild('RO_Id')
+        .equalTo(queryObj['MerTradeNo'])
         .once('value').then(snap => {
           let scc = false;
           let obj = snap.val();
           console.log(obj)
-          if(!obj) { console.log('>>> 找不到訂單!!'); return 0; }
-          
+          if(!obj) {
+            console.log('>>> 找不到訂單!!');
+            fireDB.ref(__PATH_PAY_LOGS_ERROR).push(Object.assign({_ERROR: '找不到訂單'}, queryObj));
+            return 0;
+          }
           Object.keys(obj).forEach(key => {
             scc = true;
-            fireDB.ref(__PATH_REMIT_ORDERS + key).update({
-              'RO_t': '00002',
-              'RO_c': '已繳款並等待處理',
-              'RO_clr': '#b9c1ff',
+            fireDB.ref(__PATH_REMIT_ORDERS + key).update(update).then(res => {
+              confirmOrder(queryObj.MerID, queryObj.MerTradeNo);
             });
           });
           if(scc) {
@@ -71,7 +83,7 @@ export const updateOrderStatus = (queryObj) => {
           }
         });
       } else {
-        fireDB.ref(__PATH_PAY_LOGS_ERROR).push(Object.assign({_ERROR: '繳費異常'}, queryObj));
+        fireDB.ref(__PATH_PAY_LOGS_ERROR).push(Object.assign({_ERROR: '萬付通CB異常'}, queryObj));
       }
       
       resolve(true);
@@ -130,14 +142,18 @@ export const updateOrderStatus = (queryObj) => {
   // })
 }
 
-const confirmOrder = (MerID, MerTradeNo, SignCode) => {
+const confirmOrder = (MerID, MerTradeNo) => {
   return new Promise((resolve, reject) => {
+    let formdata = {
+      MerID: MerID,
+      MerTradeNo: MerTradeNo,
+    }
     request.post({
       url: 'https://payment.onepaid.com/payment/confirmorder',
       form: {
         MerID: MerID,
         MerTradeNo: MerTradeNo,
-        SignCode: SignCode
+        signCode: createSignCode(formdata),
       }
     }, (err, res, body) => {
       if(err) {
@@ -166,7 +182,7 @@ const selectVendorAndMember = (o_id, client) => {
   })
 }
 
-const notifyVendor = (RO_Id, TotalAmt) => {
+export const notifyVendor = (RO_Id, TotalAmt) => {
   return new Promise((resolve, reject) => {
     // request.post({
     //   url: 'https://iintw.com/onesignal',
@@ -189,15 +205,19 @@ const notifyVendor = (RO_Id, TotalAmt) => {
     try {
       TotalAmt = parseInt(TotalAmt);
       let NotiObj = new OneSignal.Notification({
+        headings:  { en: `收到新的繳費！` },
           contents: {
               en: `訂單編號「${RO_Id}」成功繳款 ${TotalAmt} 元！`,
           },
+          filters: [
+            { field: 'tag', key: 'REMIT', value: 'TRUE' },
+          ],
       });
-      let filters = [
-        { field: 'tag', key: 'REMIT', value: 'TRUE' },
-      ];
-      NotiObj.setFilters(filters);
-      NotiObj.setParameter('headings', { en: `收到新的繳費！` });
+      // let filters = [
+      //   { field: 'tag', key: 'REMIT', value: 'TRUE' },
+      // ];
+      // NotiObj.setFilters(filters);
+      // NotiObj.setParameter('headings', { en: `收到新的繳費！` });
       OneS.sendNotification(NotiObj, function (err, httpResponse, data) {
         if (err || data['errors']) {
             reject({

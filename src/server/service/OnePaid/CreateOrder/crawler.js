@@ -16,6 +16,9 @@ export const getOnePaidOrderKey = (body) => {
     const value = select_formVal.eq(i).attr('value');
     result.data[name] = value;
   }
+  if (!result.action) {
+    result['err'] = $(".errorPages > h3").eq(0).text();
+  }
   console.log(result);
   return result;
 }

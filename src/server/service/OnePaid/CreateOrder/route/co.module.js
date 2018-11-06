@@ -2,6 +2,8 @@ import request from 'request';
 import * as crawler from '../crawler';
 import {createSignCode} from '../createSignCode'
 import * as orderModule from '../../../../routes/pgslq/onepaid/order/order.module';
+import * as dateFormat from 'dateformat';
+import { config } from '../../../../../config/config';
 /**
  * ORDER TYPE
  * @param {Object} order 
@@ -13,7 +15,7 @@ import * as orderModule from '../../../../routes/pgslq/onepaid/order/order.modul
  * @param {*} order.value.CurrencyType - 1
  * @param {*} order.value.TotalAmt -
  * @param {*} order.value.ReturnUrl - http://149.28.146.174/api/op/cp/
- * @param {*} order.val ue.Remark -
+ * @param {*} order.value.Remark -
  * @param {*} order.value.CustomeArgs -
  * @param {*} order.value.ShowResult - 0
  * @param {*} order.value.SignCode -
@@ -24,7 +26,14 @@ export const createOnePaidOrder = (order, o_id) => {
 
   return new Promise( async (resolve, reject) => {
     if(!order['value']) { reject(''); }
-    order['secCode'] = '9184c6821c5b4713937d26a305fd1353';
+
+    order['secCode'] = config.secCode; // 
+    order['value'].MerID = config.MerID;
+    order['value'].MerTradeDate = dateFormat(new Date(), "yyyy-mm-dd hh:MM:ss");
+    order['value'].PaymentType = 37;
+    order['value'].CurrencyType = 1;
+    order['value'].ReturnUrl = 'http://149.28.146.174/api/op/cp/';
+    order['value'].ShowResult = 0;
     let res;
     try {
       res = await step1(order);
@@ -41,6 +50,7 @@ export const createOnePaidOrder = (order, o_id) => {
       }, err => {
         reject(err);
       });
+      return;
       
     } catch(err) {
       console.log('step2 error');
@@ -69,13 +79,22 @@ const step1 = (order) => {
   const signCode = createSignCode(order.value, order.secCode)
   let op_order = order.value;
   op_order['SignCode'] = signCode;
+  console.log('======== TO payorder ===========')
+  console.log(order.value);
+  console.log('======== =========== ===========')
+  // return Promise.resolve({});
   return postRequest(url, op_order, crawler.getOnePaidOrderKey);
 }
 
 // form: from One-Paid 'https://payment.onepaid.com/payment/payorder'
 const step2 = (form) => {
-  const url = `https://payment.onepaid.com${form.action}`;
-  return postRequest(url, form.data, crawler.sendDataBack);
+  if (form['err']) {
+    return Promise.reject(form['err']);
+  } else {
+    const url = `https://payment.onepaid.com${form.action}`;
+    return postRequest(url, form.data, crawler.sendDataBack);
+  }
+  
 }
 
 // form: from One-Paid 'https://payment.onepaid.com${form.action}'

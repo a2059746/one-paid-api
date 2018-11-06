@@ -14,6 +14,14 @@ export const updateOrderStatus = async (req, res) => {
     })
   }
 }
+export const notify = async (req, res) => {
+  const queryObj = req.body;
+  cpModule.notifyVendor('NOTIFY TEST', 999).then(scc => {
+    res.json(scc);
+  }, err => {
+    res.json(err);
+  });
+}
 /**
  * 
  * 
