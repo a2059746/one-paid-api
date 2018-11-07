@@ -10,12 +10,14 @@ export const postOnePaidOrder = async (req, res) => {
       })
     }, err => {
       res.json({
+ex:1,
         result: null,
         err: err,
       })
     });
   } catch(err) {
     res.json({
+ex:2,
       result: null,
       err: err
     })

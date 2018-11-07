@@ -23,10 +23,21 @@ if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
+/**
+ * JPK
+ * C018110616000001
+ * 14b21bf3872847fab751e1846606da23
+ * ---
+ * GOWINT
+ * C018091320000001
+ * 9184c6821c5b4713937d26a305fd1353
+ */
 export const config = {
   version: envVars.VERSION,
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  secCode: '9184c6821c5b4713937d26a305fd1353',
+  MerID: 'C018091320000001',
 }
 
 export const myConfig = {
@@ -44,3 +55,4 @@ export const pgConfig = {
   pgPass: envVars.PG_PASS, // 資料庫密碼(PG_PASS)
   pgDatabase: envVars.PG_DATABASE // 資料庫名稱(PG_DATABASE)
 }
+

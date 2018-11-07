@@ -23,31 +23,34 @@ import * as orderModule from '../../../../routes/pgslq/onepaid/order/order.modul
 export const createOnePaidOrder = (order, o_id) => {
 
   return new Promise( async (resolve, reject) => {
-    if(!order['value']) { reject(''); }
-    order['secCode'] = '9184c6821c5b4713937d26a305fd1353';
-    let res;
-    try {
-      res = await step1(order);
-    } catch(err) {
-      console.log('step1 error');
-      console.log(err);
-      reject(err);
-      return;
-    }
+//     if(!order['value']) { reject(''); }
+    // order['secCode'] = '9184c6821c5b4713937d26a305fd1353';
+    let res = order ;
+	console.log('=======');
+console.log(res);
+// return new Promise((resolve, reject) => {
+ let url = 'https://payment.onepaid.com/CVNStore';
+ 
+   request.post(url, {
+header: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.36 (KHTML, like Gecko) chrome/56.0.2924.87 Safari/537.36"
+        },
 
-    try {
-      await step2(res).then(result => {
+        // url: url,
+        json: res
+
+ }, (err, res, body) => {
+   //   if(err) {
+    //    reject(err);
+    //    return;
+//      }
+        console.log('????????????');
+        console.log(body)
+        const result = crawler.sendDataBack(body);
         resolve(result);
-      }, err => {
-        reject(err);
-      });
-      
-    } catch(err) {
-      console.log('step2 error');
-      console.log(err);
-      reject(err);
-      return;
-    }
+});
+// }).then(() => {});
+
 
     // try {
     //   res = await step3(res, o_id);
@@ -76,8 +79,9 @@ const step1 = (order) => {
 
 // form: from One-Paid 'https://payment.onepaid.com/payment/payorder'
 const step2 = (form) => {
-  const url = `https://payment.onepaid.com${form.action}`;
-  return postRequest(url, form.data, crawler.sendDataBack);
+  // const url = `https://payment.onepaid.com${form.action}`;
+  let url = 'https://payment.onepaid.com/CVNStore';
+	return postRequest(url, form, crawler.sendDataBack);
 }
 
 // form: from One-Paid 'https://payment.onepaid.com${form.action}'
@@ -91,15 +95,23 @@ const step3 = (form, o_id) => {
 }
 
 function postRequest(url, formData, crawlerF) {
-  return new Promise((resolve, reject) => {
+console.log('!!!!');  
+return new Promise((resolve, reject) => {
     request.post(url, {
-      // url: url,
-      formData: formData
-    }, (err, res, body) => {
-      if(err) {
-        reject(err);
-        return;
-      }
+header: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) chrome/56.0.2924.87 Safari/537.36"
+        },
+  
+        // url: url,
+        json: formData   
+
+ }, (err, res, body) => {
+   //   if(err) {
+    //    reject(err);
+    //    return;
+//      }
+	console.log('????????????');
+	console.log(body)
       if(crawlerF) {
         const result = crawlerF(body);
         resolve(result);
