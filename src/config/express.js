@@ -30,7 +30,7 @@ app.use('/',express.static('/home/yiyo/one-paid-api/html/'));
 // app.use('/api', index);
 app.use('/api', pgIndex);
 app.use('/api/op', opIndex);
-console.log('angular folder: ' + __dirname + 'html');
+
 app.use('*', function(req, res, next) {
   res.sendFile('/home/yiyo/one-paid-api/html/index.html');
 })

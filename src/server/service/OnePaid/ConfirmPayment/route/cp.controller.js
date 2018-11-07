@@ -4,10 +4,15 @@ export const updateOrderStatus = async (req, res) => {
   const queryObj = req.body;
   try {
     const result = await cpModule.updateOrderStatus(queryObj);
+console.log('============TEST')
+    console.log(result)
     res.json({
       result: result
     })
   } catch(err) {
+    console.log('============TEST')
+
+    console.log(err)
     res.json({
       result: null,
       err: err

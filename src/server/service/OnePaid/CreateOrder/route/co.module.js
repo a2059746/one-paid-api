@@ -76,7 +76,7 @@ export const createOnePaidOrder = (order, o_id) => {
 // oder: from iintw app
 const step1 = (order) => {
   const url = 'https://payment.onepaid.com/payment/payorder';
-  const signCode = createSignCode(order.value, order.secCode)
+  const signCode = createSignCode(order.value);
   let op_order = order.value;
   op_order['SignCode'] = signCode;
   console.log('======== TO payorder ===========')
@@ -108,21 +108,28 @@ const step3 = (form, o_id) => {
 }
 
 function postRequest(url, formData, crawlerF) {
+  console.log('======== WWWWTF =======')
+  console.log(url, formData);
   return new Promise((resolve, reject) => {
-    request.post(url, {
-      // url: url,
-      formData: formData
-    }, (err, res, body) => {
-      if(err) {
-        reject(err);
-        return;
-      }
-      if(crawlerF) {
-        const result = crawlerF(body);
-        resolve(result);
-      } else {
-        resolve(body);
-      }
-    })
+    setTimeout(() => {
+      request.post(url, {
+        // url: url,
+        formData: formData
+      }, (err, res, body) => {
+        console.log('======== WWWWTF2 =======')
+        console.log(body);
+        if(err) {
+          reject(err);
+          return;
+        }
+        if(crawlerF) {
+          const result = crawlerF(body);
+          resolve(result);
+        } else {
+          resolve(body);
+        }
+      })
+    }, 1000);
+    
   })
 }

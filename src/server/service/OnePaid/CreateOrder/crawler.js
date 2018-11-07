@@ -26,9 +26,12 @@ export const getOnePaidOrderKey = (body) => {
 // Step2
 // Send One-Paid's order info back to our server
 export const sendDataBack = (body) => {
+  console.log('====WTF====')
+  console.log(body)
   const $ = cheerio.load(body);
   const result = {};
   const selector = $("form > input");
+  if(!selector.length) { return null; }
   for(let i = 0; i < selector.length; i++) {
     const name = selector.eq(i).attr('name');
     const value = selector.eq(i).attr('value');
