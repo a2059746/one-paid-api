@@ -12,10 +12,10 @@ export const postOnePaidOrder = async (req, res) => {
   const o_id = req.params.oid;
   try {
     await coModule.createOnePaidOrder(order, o_id).then(scc => {
-    console.log('=======')
-      console.log(scc)  
       res.json({
-        result: scc
+        err: false,
+        // result: scc,
+        data: scc,
       })
     }, err => {
       console.log(err)

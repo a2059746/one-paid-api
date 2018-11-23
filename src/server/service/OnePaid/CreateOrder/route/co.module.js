@@ -36,7 +36,15 @@ export const createOnePaidOrder = (order, o_id) => {
     order['value'].ShowResult = 0;
     let res;
     try {
-      res = await step1(order);
+      await step1(order).then(scc => {
+        res = scc;
+        // resolve(scc);
+      }, err => {
+        console.log('step1 error');
+        console.log(err);
+        reject(err);
+      });
+      // return ;
     } catch(err) {
       console.log('step1 error');
       console.log(err);
@@ -45,6 +53,8 @@ export const createOnePaidOrder = (order, o_id) => {
     }
 
     try {
+      console.log('============= GOGOGO');
+      console.log(res);
       await step2(res).then(result => {
         resolve(result);
       }, err => {
@@ -92,7 +102,28 @@ const step2 = (form) => {
     return Promise.reject(form['err']);
   } else {
     const url = `https://payment.onepaid.com${form.action}`;
-    return postRequest(url, form.data, crawler.sendDataBack);
+    // return postRequest(url, form.data, crawler.sendDataBack);
+    return new Promise((reso, reje) => {
+      console.log('====GOGO===')
+      request.post('https://payment.onepaid.com/CVNStore', {
+        header: {
+              "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) chrome/56.0.2924.87 Safari/537.36"
+              },
+              json: form.data
+      }, (error, res, body) => {
+        if (error) {
+          console.error(error)
+          reje(error)
+          return ;
+        }
+        console.log(`statusCode: ${res.statusCode}`)
+        const result = crawler.sendDataBack(body);
+        reso(result);
+      })
+     
+    })
+    
+
   }
   
 }
@@ -108,16 +139,15 @@ const step3 = (form, o_id) => {
 }
 
 function postRequest(url, formData, crawlerF) {
-  console.log('======== WWWWTF =======')
-  console.log(url, formData);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       request.post(url, {
+        header: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) chrome/56.0.2924.87 Safari/537.36"
+        },
         // url: url,
-        formData: formData
+        json: formData
       }, (err, res, body) => {
-        console.log('======== WWWWTF2 =======')
-        console.log(body);
         if(err) {
           reject(err);
           return;
@@ -129,7 +159,6 @@ function postRequest(url, formData, crawlerF) {
           resolve(body);
         }
       })
-    }, 1000);
-    
+    }, 200);
   })
 }

@@ -44,8 +44,8 @@ export const updateOrderStatus = (queryObj) => {
       fireDB.ref(__PATH_PAY_LOGS).push(queryObj);
       if (queryObj['MerTradeNo']) {
         let update = {
-          'RO_t': (queryObj['StatusCode'] === 10001)? '00002' : '09000',
-          'RO_c': (queryObj['StatusCode'] === 10001)? '已繳款並等待處理' : '訂單異常',
+          'RO_t': (queryObj['StatusCode'] === 10001)? '00100' : '09000',
+          'RO_c': (queryObj['StatusCode'] === 10001)? '訂單已完成' : '訂單異常',
           'ROP_PaymentDate': queryObj['PaymentDate'],
           'ROP_PTime': new Date(queryObj['PaymentDate'] + ' GMT+0800').getTime(),
           _OnePaid: JSON.stringify(queryObj),
