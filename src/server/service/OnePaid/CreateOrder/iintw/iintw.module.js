@@ -5,67 +5,45 @@ import * as orderModule from '../../../../routes/pgslq/onepaid/order/order.modul
 import * as dateFormat from 'dateformat';
 import { config } from '../../../../../config/config';
 
-// import { fireDB } from '../../ConfirmPayment/route/cp.module';
-// const firebase = require("firebase-admin");
-import firebase from '../../../../firebase';
-const fireDB = firebase.database();
-export const __PATH_REMIT_SETTINGS = '/__REMIT__/__SETTINGS__/';
-function pad(str, size = 6) {
-  str += '';
-  while (str.length < (size || 2)) {str = '0' + str; }
-  return str;
-}
-var SETTINGS = {
-  RO_Id_Pre: 'JPK-AA',
-  RO_Id_Num: 1,
-  RO_Id: 'JPK-AA' + pad(1),
-};
-
-fireDB.ref(__PATH_REMIT_SETTINGS).on('value',snap => {
-  let values = snap.val();
-  Object.assign(SETTINGS, values);
-  SETTINGS['RO_Id_Num'] = parseInt(SETTINGS['RO_Id_Num'], 10);
-  SETTINGS['RO_Id'] = SETTINGS['RO_Id_Pre'] + pad(SETTINGS['RO_Id_Num']);
-  console.log(SETTINGS);
-});
 
 /**
  * ORDER TYPE
  * @param {Object} order 
  * @param {string} order.value.MerID - 商家編號 C018091320000001
  * @param {*} order.value.MerTradeNo -  // RO_Id
- * @param {*} order.value.MerTradeDate -
- * @param {*} order.value.PaymentType - 37
- * @param {*} order.value.ProductName -  // 'JPK - 薪資國際匯款'
- * @param {*} order.value.CurrencyType - 1
+ * @param {*} order.value.PaymentType - 37 || 31
  * @param {*} order.value.TotalAmt -
- * @param {*} order.value.ReturnUrl - http://149.28.146.174/api/op/cp/
  * @param {*} order.value.Remark -
- * @param {*} order.value.CustomeArgs -
- * @param {*} order.value.ShowResult - 0
- * @param {*} order.value.SignCode -
+//  * @param {*} order.value.ProductName
+//  * @param {*} order.value.CurrencyType - 1
+//  * @param {*} order.value.ReturnUrl - http://149.28.146.174/api/op/cp/
+//  * @param {*} order.value.CustomeArgs -
+//  * @param {*} order.value.ShowResult - 0
+//  * @param {*} order.value.MerTradeDate -
  * @param {*} order.secCode - 商店金鑰 9184c6821c5b4713937d26a305fd1353
+ 
  * 
  */
 export const createOnePaidOrder = (order, IP) => {
 
   return new Promise( async (resolve, reject) => {
-    if(!order['value']) { reject(''); }
+    if(!order['value']) { reject('PARAM ERROR'); return 0; }
     
-    order['secCode'] = config.secCode; // 
-    order['value'].MerTradeNo = SETTINGS['RO_Id'];
-    order['value'].MerID = config.MerID;
+    // order['value'].PaymentType = 37;
+    // order['secCode'] = '9184c6821c5b4713937d26a305fd1353'; // 
+    // order['value'].MerID = 'C018091320000001';
+    order['value'].TotalAmt = order['value'].TotalAmt + '';
+    order['value'].MerTradeNo = '' + order['value'].MerTradeNo;
     order['value'].MerTradeDate = dateFormat(new Date(), "yyyy-mm-dd hh:MM:ss");
-    order['value'].PaymentType = 37;
     order['value'].CurrencyType = 1;
     order['value'].ReturnUrl = 'http://149.28.146.174/api/op/cp/';
     order['value'].ShowResult = 0;
-    order['value'].ProductName = 'JPK - 薪資國際匯款';
+    order['value'].ProductName = 'IINTW - 薪資國際匯款';
+    order['value'].Remark = order['value'].Remark || '無'; // 
     console.log(order);
     let res;
     try {
       await step1(order).then(scc => {
-        addRO_Id(); // 成功後增加訂單編號
         res = scc;
         // resolve(scc);
       }, err => {
@@ -114,7 +92,7 @@ export const createOnePaidOrder = (order, IP) => {
 // oder: from iintw app
 const step1 = (order) => {
   const url = 'https://payment.onepaid.com/payment/payorder';
-  const signCode = createSignCode(order.value);
+  const signCode = createSignCode(order.value, order.secCode);
   let op_order = order.value;
   op_order['SignCode'] = signCode;
   // return Promise.resolve({});
@@ -204,12 +182,4 @@ function postRequest(url, formData, crawlerF) {
       })
     }, 200);
   })
-}
-function addRO_Id() {
-  SETTINGS['RO_Id_Num'] += 1;
-  SETTINGS['RO_Id'] = SETTINGS['RO_Id_Pre'] + pad(SETTINGS['RO_Id_Num']);
-  let num = SETTINGS['RO_Id_Num'];
-  if(num >= 0) {
-    fireDB.ref(__PATH_REMIT_SETTINGS + 'RO_Id_Num').set(num);
-  }
 }

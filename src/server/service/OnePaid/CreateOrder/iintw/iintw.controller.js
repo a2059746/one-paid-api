@@ -1,4 +1,4 @@
-import * as coModule from './co.module';
+import * as coModule from './iintw.module';
 import * as crawler from '../crawler';
 
 export const postCrawer = async (req, res) => {

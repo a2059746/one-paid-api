@@ -2,8 +2,8 @@ import crypto from 'crypto';
 import { config } from '../../../../config/config'
 
 // secCode: securtiy code
-export const createSignCode = (order) => {
-  let secCode = config.secCode;
+export const createSignCode = (order, _secCode = null) => {
+  let secCode = _secCode || config.secCode;
   // step1: order by order key from A to Z ; connect keys by '&'
   let md5 = crypto.createHash('md5');
   console.log('==============md5==================')

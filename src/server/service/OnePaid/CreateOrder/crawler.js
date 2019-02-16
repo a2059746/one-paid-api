@@ -19,15 +19,12 @@ export const getOnePaidOrderKey = (body) => {
   if (!result.action) {
     result['err'] = $(".errorPages > h3").eq(0).text();
   }
-  console.log(result);
   return result;
 }
 
 // Step2
 // Send One-Paid's order info back to our server
 export const sendDataBack = (body) => {
-  console.log('====WTF====')
-  console.log(body)
   const $ = cheerio.load(body);
   const result = {};
   const selector = $("form > input");

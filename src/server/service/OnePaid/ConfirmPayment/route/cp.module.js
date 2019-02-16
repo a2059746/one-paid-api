@@ -10,12 +10,7 @@ const OneS = new OneSignal.Client({
   }
 });
 
-const firebase = require("firebase-admin");
-var serviceAccount = require("../../../../../iintw-single-firebase-adminsdk-zzrlm-3b7ecc2991.json");
-firebase.initializeApp({
-  credential: firebase.credential.cert(serviceAccount),
-  databaseURL: "https://iintw-single.firebaseio.com"
-});
+import firebase from '../../../../firebase';
 const fireDB = firebase.database();
 const __PATH_PAY_LOGS = '/__REMIT__/__PAY_LOGS__/';
 const __PATH_PAY_LOGS_ERROR = '/__REMIT__/__PAY_LOGS_ERROR__/';
@@ -43,9 +38,56 @@ export const updateOrderStatus = (queryObj) => {
       queryObj['_cbt'] = new Date().getTime();
       fireDB.ref(__PATH_PAY_LOGS).push(queryObj);
       if (queryObj['MerTradeNo']) {
+        if(queryObj['MerTradeNo'].includes('TRA')) {
+          console.log('================ IINTW TRA ==================')
+          request.post('https://iintw.com/u/transmit/onepaid', {
+            json: queryObj
+          }, (err, res, body) => {
+            if(err) {
+              console.log(err);
+              reject('ERR');
+              return;
+            }
+            if(body['scc']) {
+              console.log('SUCCESSED!!');
+              // confirmOrder(queryObj.MerID, queryObj.MerTradeNo, '9184c6821c5b4713937d26a305fd1353');
+              resolve(true);
+            } else {
+              reject('ERR');
+              console.log('ERROR!!');
+              console.log(body);
+            }
+          });
+          return 1;
+        }
+        /** */
+        if(queryObj['MerTradeNo'].includes('LOAN')) {
+          console.log('================ LOAN ==================')
+          request.post('https://iintw.com/u/loan/onepaid', {
+            json: queryObj
+          }, (err, res, body) => {
+            if(err) {
+              console.log(err);
+              reject('ERR');
+              return;
+            }
+            if(body['scc']) {
+              console.log('SUCCESSED!!');
+              confirmOrder(queryObj.MerID, queryObj.MerTradeNo, '9184c6821c5b4713937d26a305fd1353');
+              resolve(true);
+            } else {
+              reject('ERR');
+              console.log('ERROR!!');
+              console.log(body);
+            }
+          });
+          return 1;
+        }
+        /** */
         let update = {
           'RO_t': (queryObj['StatusCode'] === 10001)? '00100' : '09000',
           'RO_c': (queryObj['StatusCode'] === 10001)? '訂單已完成' : '訂單異常',
+          
           'ROP_PaymentDate': queryObj['PaymentDate'],
           'ROP_PTime': new Date(queryObj['PaymentDate'] + ' GMT+0800').getTime(),
           _OnePaid: JSON.stringify(queryObj),
@@ -142,7 +184,7 @@ export const updateOrderStatus = (queryObj) => {
   // })
 }
 
-const confirmOrder = (MerID, MerTradeNo) => {
+export const confirmOrder = (MerID, MerTradeNo, secode = null) => {
   return new Promise((resolve, reject) => {
     let formdata = {
       MerID: MerID,
@@ -153,7 +195,7 @@ const confirmOrder = (MerID, MerTradeNo) => {
       form: {
         MerID: MerID,
         MerTradeNo: MerTradeNo,
-        signCode: createSignCode(formdata),
+        signCode: createSignCode(formdata, secode),
       }
     }, (err, res, body) => {
       if(err) {
@@ -259,3 +301,23 @@ const notifyMember = (m_phone) => {
     })
   })
 }
+
+/*
+ {
+    "StatusCode": 10001,
+    "Message": "成功",
+    "MerID": "C018122017000001",
+    "MerTradeNo": "TRA-S000013",
+    "TradeNo": "TCV01812211342324261",
+    "PaymentDate": "2018-12-21 13:44:52",
+    "PaywayType": "1",
+    "PaymentType": "37",
+    "ProductName": "IINTW - 薪資國際匯款",
+    "CurrencyType": "1",
+    "TotalAmt": "32.00",
+    "CustomeArgs": "",
+    "Remark": "/__SERVICES__/__TRANSMITS__/__ORDERS__UIDLIST/KJlQwlsNDMNKqlDjA6JVLTuK52k2/-LUEHKqgB_1-E93IinCS",
+    "SignCode": "79aca10470ea1904dd81d47ef1a3250d"
+}
+
+*/

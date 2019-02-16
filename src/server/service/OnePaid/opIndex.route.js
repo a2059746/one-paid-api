@@ -3,8 +3,10 @@ import createOrder from './CreateOrder/route/co.route';
 import confirmPayment from './ConfirmPayment/route/cp.route';
 import request from 'request';
 import { createSignCode } from './CreateOrder/createSignCode';
+import iintwRoute from './CreateOrder/iintw/iintw.route';
 const router = express.Router();
 
+router.use('/iintw-order', iintwRoute);
 /* routers */
 router.use('/co', createOrder);
 router.use('/cp', confirmPayment);

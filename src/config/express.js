@@ -9,9 +9,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 import ev from 'express-validation';
 
-
-
 const app = express();
+import FIRE from '../server/firebase';
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))

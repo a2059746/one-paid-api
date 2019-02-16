@@ -1,5 +1,26 @@
 import * as cpModule from './cp.module';
+export const confirmOrder = async (req, res) => {
+  const { MerID, MerTradeNo, secode } = req.body || {};
+  if (!MerID || !MerTradeNo || !secode) {
+    res.json({
+      err: true,
+      msg: '!MerID || !MerTradeNo || !secode',
+    })
+  } else {
+    cpModule.confirmOrder(MerID, MerTradeNo, secode).then(scc => {
+      res.json({
+        err: false,
+        result: scc
+      })
+    }, err => {
+      res.json({
+        err: true,
+        msg: err
+      })
+    });
 
+  }
+}
 export const updateOrderStatus = async (req, res) => {
   const queryObj = req.body;
   try {
